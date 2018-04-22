@@ -14,6 +14,7 @@ namespace BasicWebAPI1.Test
         /// </summary>
         ProductsController controller;
         Product mazda = new Product() { Id = 6, Name = "Mazda 2", Description = "Small compact model" };
+        Product test = new Product() { Id = 6, Name = "test produce", Description = "I created this to do test on" };
 
         [TestInitialize]
         public void TestInitialize()
@@ -122,5 +123,95 @@ namespace BasicWebAPI1.Test
             Assert.IsTrue(productList.Count == 5, "Should have 5 products returned.");
         }
 
+        /// <summary
+        /// Adds product to the list
+        /// </summary
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void GetProductById()
+        {
+            int idNum = 7;
+
+            List<Product> productList = (List<Product>)controller.GetProducts();
+            try
+            {
+                bool foundId = false;
+                foreach (Product product in productList)
+                {
+                    if (product.Id == idNum)
+                    {
+                        Assert.Fail();
+                        foundId = true;
+                    }
+                }
+                Assert.IsTrue(foundId == false);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail();
+            }
+        }
+        //Matthew Brady
+        /// <summary
+        /// GetProducts returns correct number of products when more than one are added (do a post first)
+        /// </summary
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void PostProductAddsProductToProducts2()
+        {
+            var newProduct = controller.PostProduct(mazda);
+            var newProduct2 = controller.PostProduct(test);
+            List<Product> productList = (List<Product>)controller.GetProducts();
+
+            Assert.IsTrue(productList.Count == 7, "We should now have 6 products in our product list");
+        }
+        //Matthew Brady
+        /// <summary
+        /// PutProduct updates newly created product.
+        /// </summary
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void PutProductUpdatesNewProduct()
+        {
+            string newName = null;
+            string newDescription = null;
+            test.Name = newName;
+            test.Description = newDescription;
+            var updatetest = controller.PutProduct(test);
+            var updatedtest = controller.GetProductById(test.Id);
+
+            Assert.IsTrue(updatedtest.Id == 7, "Id returned should be 7");
+            Assert.IsTrue(updatedtest.Name == newName, "Id returned should be 7");
+            Assert.IsTrue(updatedtest.Description == newDescription, "Id returned should be 7");
+
+        }
+        //Matthew Brady
+        /// <summary
+        /// DeleteProduct Does not delete a product if a name or description is passed in
+        /// </summary
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void DeletePoductIfNoNameDescription()
+        {
+            List<Product> productList = (List<Product>)controller.GetProducts();
+            int startCount = productList.Count;
+            try
+            {
+                foreach (Product p in productList)
+                {
+                    if ((p.Name == null) || (p.Description == null))
+                    {
+                        var deletedProduct = controller.DeleteProduct(p.Id);
+                    }
+                }
+
+                Assert.IsTrue(productList.Count == 5, "Should have 5 products returned.");
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail();
+            }
+        }
     }
+    
 }
